@@ -4,9 +4,12 @@ use Tkx;
 Tkx::font_create("AppHighlightFont", -family => "Helvetica", -size => 20, -weight => "bold");
 Tkx::font_create("AppHighlightFonttext", -family => "Helvetica", -size => 18);
 Tkx::font_create("AppHighlightFontresult", -family => "Helvetica", -size => 28);
+Tkx::font_create("AppHighlightFontInfo", -family => "Helvetica", -size => 10);
+Tkx::font_create("AppHighlightFonterror", -family => "Helvetica", -size => 10, );
 our $VERSION = "1.00";
 (my $progname = $0) =~ s,.*[\\/],,;
 my $IS_AQUA = Tkx::tk_windowingsystem() eq "aqua";
+Tkx::package_require("tile");
 Tkx::package_require("style");
 Tkx::style__use("as", -priority => 70);
 my $mainWindow = Tkx::widget->new(".");
@@ -40,8 +43,12 @@ sub main
     #create a textbox where user can enter input
     my $inputboxbus = $contentFrame->new_ttk__entry(-width => 10, -textvariable => \$inputb,-font => "AppHighlightFonttext");
     $inputboxbus->g_grid(-column => 1, -row => 1, -sticky => "nesw",-pady => "20",-ipadx => "100",-ipady => "10",);
+	$inputboxbus->configure(-validate => 'all',-background => 'red', -validatecommand => [\&Entry, Tkx::Ev('%P')]);
+
 	my $labelbus = $contentFrame->new_ttk__label(-text => "Bus",-font => "AppHighlightFont");
 	$labelbus->g_grid(-column => 0, -row => 1, -sticky => "we", -padx => 5, -pady => 5);
+	my $labelbusinfo = $contentFrame->new_ttk__label(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo");
+	$labelbusinfo->g_grid(-column => 2, -row => 1, -sticky => "we", -padx => 5, -pady => 5);
 	
     #create a textbox where user can enter input
     my $inputboxdevice = $contentFrame->new_ttk__entry(-width => 10, -textvariable => \$inputd,-font => "AppHighlightFonttext");
@@ -69,6 +76,18 @@ sub main
     #$mainWindow->g_bind("<Return>",sub {dostuff(\$output,\$inputb,\$inputd,\$inputf);});
 
     Tkx::MainLoop;
+	
+	sub Entry
+	{
+
+	print "Entry: '$_[1]'\n";
+	if((($_[0]=~/[0-9]/)||($_[0]=~/[A-F]/)||($_[0]=~/[a-f]/)) && (hex($_[0])<=255) && (0<=hex($_[0]))){
+		$labelbusinfo->configure(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo",-foreground => "black");
+		return 1;
+		}
+	$labelbusinfo->configure(-text => "Input should be 00-FF", -foreground => "red");
+		return 0;
+	}
 }
 
 sub dostuff
