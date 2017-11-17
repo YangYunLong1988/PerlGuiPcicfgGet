@@ -80,8 +80,8 @@ sub main
 	sub Entry
 	{
 
-	print "Entry: '$_[1]'\n";
-	if((hex($_[0])<=255) && (0<=hex($_[0]))){
+#^start $end£ºthen the string itself, min 1, max 2 repeat
+	if($_[0]=~/^[0-9a-fA-F]{1,2}$/){
 		$labelbusinfo->configure(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo",-foreground => "black");
 		return 1;
 		}
