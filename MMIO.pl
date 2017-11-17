@@ -47,7 +47,7 @@ sub main
 
 	my $labelbus = $contentFrame->new_ttk__label(-text => "Bus",-font => "AppHighlightFont");
 	$labelbus->g_grid(-column => 0, -row => 1, -sticky => "we", -padx => 5, -pady => 5);
-	my $labelbusinfo = $contentFrame->new_ttk__label(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo");
+	my $labelbusinfo = $contentFrame->new_ttk__label(-text => "Hexadecimal 00-FF",-font => "AppHighlightFontInfo");
 	$labelbusinfo->g_grid(-column => 2, -row => 1, -sticky => "we", -padx => 5, -pady => 5);
 	
     #create a textbox where user can enter input
@@ -81,14 +81,21 @@ sub main
 	{
 
 	print "Entry: '$_[1]'\n";
-	if((($_[0]=~/[0-9]/)||($_[0]=~/[A-F]/)||($_[0]=~/[a-f]/)) && (hex($_[0])<=255) && (0<=hex($_[0]))){
+	if((hex($_[0])<=255) && (0<=hex($_[0]))){
 		$labelbusinfo->configure(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo",-foreground => "black");
 		return 1;
 		}
+#if null??
+	if(!$_[0]){
+		return 1;
+	}
 	$labelbusinfo->configure(-text => "Input should be 00-FF", -foreground => "red");
 		return 0;
 	}
 }
+
+
+
 
 sub dostuff
 {
