@@ -36,7 +36,7 @@ sub main
     #create a textbox where user can enter input
     my $inputpcieb = $contentFrame->new_ttk__entry(-width => 10, -textvariable => \$inputpciebase,-font => "AppHighlightFonttext");
     $inputpcieb->g_grid(-column => 1, -row => 0, -sticky => "nesw",-pady => "20",-ipadx => "100",-ipady => "10");
-	$inputpcieb->insert(0,'80000000');
+	$inputpcieb->insert(0,'E0000000');
 	my $labelmmcfg = $contentFrame->new_ttk__label(-text => "MMCFG",-font => "AppHighlightFont");
 	$labelmmcfg->g_grid(-column => 0, -row => 0, -sticky => "we", -padx => 5, -pady => 5);
 
