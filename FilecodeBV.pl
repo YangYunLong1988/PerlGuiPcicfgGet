@@ -1,4 +1,6 @@
  #!/usr/bin/perl
+ 
+ ##!!!please remove AGESA read-only property first, copy this script to AGESA folder and execute
  use strict;
  use warnings;
  use Cwd;
@@ -47,17 +49,24 @@
 						print $p."\n";
 						$pbuffer=~ s/\//_/g;
 						$pbuffer=uc($pbuffer);
-						$pbuffer=~ s/.*AgesaModulePkg_/AGESAMODULEPKG_/i;
+						if($pbuffer =~ /AgesaModulePkg/i){
+							$pbuffer=~ s/.*AgesaModulePkg_/AGESAMODULEPKG_/i;
+						}
+						else{
+							$pbuffer=~ s/.*AgesaPkg_/AGESAPKG_/i
+						}
 						$pbuffer=~s/\.[cC]$/_FILECODE/;
               					 
 							open (IN, $p) or die "$!, opening $subpath\n";
+							open (IN_bak, ">bak") or die "$!, opening $p\n";	#WRITE HANDLE
 							open (MYFILECODEOUT,">>filecodehout") or die "$!, opening filecode.h\n";
 							#find define FILECODE
 							while (my $line = <IN>)
 							{
 								
 								if($line =~m/^#define\s+FILECODE\s.*/){
-									$line =~ s/^#define\s+FILECODE\s.*/#define FILECODE  $pbuffer\n/s;
+									$line ="#define FILECODE  $pbuffer\n";
+									print IN_bak $line;		#output to write handle
 									$filecodelabel=1;
 									#save to filecode
 									$filecountbackup=sprintf("%#06X",$filecount);
@@ -67,12 +76,15 @@
 										$text.=$pbuffer;
 										$text=sprintf "%-110s", $text;
 										print MYFILECODEOUT $text."  $filecountbackup\n";
-	
+									next;
 								}
+								print IN_bak $line;		#output to write handle
 							}
 							
 							close MYFILECODEOUT;
 							close IN;
+							close IN_bak;
+							rename("bak", "$p");
 							if($filecodelabel){
 								next;
 							}
@@ -90,19 +102,20 @@
 							}						
 							close IN;
 							
-							#add define file code in last include 
+							#no define filecode, add define file code in last include 
 							$linecount=0;
-							open (IN, $p) or die "$!, opening $p\n";	
+							open (IN, $p) or die "$!, opening $p\n";	#READ HANDLE
+							open (IN_bak, ">bak") or die "$!, opening $p\n";	#WRITE HANDLE
 							open (MYFILECODEOUT,">>filecodehout") or die "$!, opening filecode.h\n";						
 							while (my $line = <IN>)
 							{
-							
+								print IN_bak $line;
 								if($line =~m/#include/){
 									
 									$linecount++;
 									if($linecountbackup == $linecount){
-										$line =~ s/\n/\n#define FILECODE  $pbuffer\n/s;
-
+										$line =~ s/.*\n$/\n#define FILECODE  $pbuffer\n/s;
+										print IN_bak $line;		#output to write handle
 									#save to filecode
 									$filecountbackup=sprintf("%#06X",$filecount);
 									$filecountbackup =~ s/X/x/;
@@ -116,7 +129,9 @@
 							}
 							
 							close IN;
+							close IN_bak;
 							close MYFILECODEOUT;
+							rename("bak", "$p"); 
                      }
                  }                
              }
@@ -138,3 +153,4 @@
  from_to($str, "utf8", "gbk"); 
   
  print $str;
+ 
