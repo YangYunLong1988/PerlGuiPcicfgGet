@@ -31,7 +31,7 @@ sub main
 	my $inputd;
 	my $inputf;
     my $output;
-
+    my $outputCF8;
 	
     #create a textbox where user can enter input
     my $inputpcieb = $contentFrame->new_ttk__entry(-width => 10, -textvariable => \$inputpciebase,-font => "AppHighlightFonttext");
@@ -68,9 +68,13 @@ sub main
     my $inputlabel = $contentFrame->new_ttk__label(-textvariable => \$output,-font => "AppHighlightFontresult");
     $inputlabel->g_grid(-column => 1, -row => 8, -sticky => "we");
 
+    #create a lable which shows whatever is input in the input box
+    my $inputlabelCF8 = $contentFrame->new_ttk__label(-textvariable => \$outputCF8,-font => "AppHighlightFontresult");
+    $inputlabelCF8->g_grid(-column => 1, -row => 10, -sticky => "we");	
+	
     #create a button and bind a sub to it
-    my $button = $contentFrame->new_ttk__button(-text=> "Click me",-command=> sub {dostuff(\$output,\$inputb,\$inputd,\$inputf,\$inputpciebase);} );
-    $button->g_grid(-column => 1, -row => 9, -sticky => "w");
+    my $button = $contentFrame->new_ttk__button(-text=> "Click me",-command=> sub {dostuff(\$output,\$outputCF8,\$inputb,\$inputd,\$inputf,\$inputpciebase);} );
+    $button->g_grid(-column => 1, -row => 12, -sticky => "w");
 
     #bind return key to method, so method will get called when key is hit
     #$mainWindow->g_bind("<Return>",sub {dostuff(\$output,\$inputb,\$inputd,\$inputf);});
@@ -80,7 +84,7 @@ sub main
 	sub Entry
 	{
 
-#^start $end£ºthen the string itself, min 1, max 2 repeat
+#^start $end:then the string itself, min 1, max 2 repeat
 	if($_[0]=~/^[0-9a-fA-F]{1,2}$/){
 		$labelbusinfo->configure(-text => "Only Hex 00-FF",-font => "AppHighlightFontInfo",-foreground => "black");
 		return 1;
@@ -100,11 +104,13 @@ sub main
 sub dostuff
 {
     my $output = shift;
+	my $outputCF8 = shift;
     my $inputb = shift;
 	my $inputd = shift;
 	my $inputf = shift;
 	my $inputmmcfg = shift;
     $$output = sprintf("%#010x",(hex($$inputmmcfg) + (hex($$inputb)<<20) + (hex($$inputd)<<15) + (hex($$inputf)<<12)));
+	$$outputCF8 = sprintf("%#010x",(hex(80000000) + (hex($$inputb)<<16) + (hex($$inputd)<<11) + (hex($$inputf)<<8)));
 }
 
 
